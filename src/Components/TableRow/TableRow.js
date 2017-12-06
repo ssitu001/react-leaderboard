@@ -4,7 +4,7 @@ import './TableRow.css';
 
 const TableRow = (props) => {
   const {alltime, img, recent, username} = props.rowData;
-  const fccURL = `www.freecodecamp.com/${username}`;
+  const fccURL = `http://www.freecodecamp.com/${username}`;
 
   return (
     <tr>
