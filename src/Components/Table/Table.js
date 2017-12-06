@@ -1,7 +1,15 @@
 import React, { Component } from 'react';
 
 import TableRow from '../TableRow/TableRow';
+import ToSortHeader from '../ToSortHeader/ToSortHeader';
 import './Table.css';
+
+const top30Url = 'https://fcctop100.herokuapp.com/api/fccusers/top/recent';
+const allTimeUrl = 'https://fcctop100.herokuapp.com/api/fccusers/top/alltime';
+const sortByMapping = [
+  {type: 'past30Days', heading: 'Points in past 30 days'},
+  {type: 'allTime', heading: 'All time points'},
+];
 
 class Table extends Component {
   constructor() {
@@ -9,12 +17,10 @@ class Table extends Component {
 
     this.state = {
       rowsData: [],
-      sortByLeast: false,
     };
   }
 
   componentDidMount() {
-    const top30Url = 'https://fcctop100.herokuapp.com/api/fccusers/top/recent';
     this.fetchData(top30Url)
   }
 
@@ -25,30 +31,27 @@ class Table extends Component {
       this.setState({
         rowsData: data,
       });
-      console.log('data', data);
     })
     .catch((err) => console.err('err::', err))
   }
 
-  componentDidUpdate() {
-    console.log(this.state)
-  }
+  handleSort = (sortType) => {    
+    if (sortType === 'past30Days') {
+      this.fetchData(top30Url);
+    }
 
-  sortPast30Days = (evt) => {
-    evt.preventDefault();
-    const {rowsData, sortByLeast} = this.state;
-
-    const sortedData = !sortByLeast ? rowsData.sort((a, b) => a.recent - b.recent) : rowsData.sort((a, b) => b.recent - a.recent);
-
-    this.setState({
-      rowsData: sortedData,
-      sortByLeast: !this.state.sortByLeast,
-    });
+    if (sortType === 'allTime') {
+      this.fetchData(allTimeUrl)
+    }
   }
 
   render() {
-    let rows = this.state.rowsData.map((rowData, i) => {
-      return <TableRow id={i+1} rowData={rowData} key={i}/>
+    const rows = this.state.rowsData.map((rowData, i) => {
+      return <TableRow key={i} id={i+1} rowData={rowData} />
+    });
+
+    const sorters = sortByMapping.map((toSortBy, i) => {
+      return <ToSortHeader key={i} sortBy={toSortBy.type} heading={toSortBy.heading} onClick={this.handleSort} />
     });
 
     return (
@@ -58,8 +61,7 @@ class Table extends Component {
             <tr>
               <th scope="col">#</th>
               <th scope="col">Camper Name</th>
-              <th scope="col" onClick={this.sortPast30Days}>Points in past 30 days</th>
-              <th scope="col">All time points</th>
+              {sorters}
             </tr>
             {rows}
             </tbody>
