@@ -7,7 +7,7 @@ class ToSortHeader extends Component {
 
   render() {
     return (
-      <th scope="col" onClick={this.handleClick}>{this.props.heading}</th>
+      <th scope="col">{this.props.heading}<i onClick={this.handleClick} className="fa fa-fw fa-sort"></i></th>
     )
   }
 }
