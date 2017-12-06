@@ -3,7 +3,7 @@ import React from 'react';
 import './TableRow.css';
 
 const TableRow = (props) => {
-  const {alltime, img, lastUpdate, recent, username} = props.rowData;
+  const {alltime, img, recent, username} = props.rowData;
   const fccURL = `www.freecodecamp.com/${username}`;
 
   return (
