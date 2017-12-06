@@ -4,8 +4,8 @@ import TableRow from '../TableRow/TableRow';
 import ToSortHeader from '../ToSortHeader/ToSortHeader';
 import './Table.css';
 
-const top30Url = 'https://fcctop100.herokuapp.com/api/fccusers/top/recent';
-const allTimeUrl = 'https://fcctop100.herokuapp.com/api/fccusers/top/alltime';
+const url = `https://fcctop100.herokuapp.com/api/fccusers/top/`;
+
 const sortByMapping = [
   {type: 'past30Days', heading: 'Points in past 30 days'},
   {type: 'allTime', heading: 'All time points'},
@@ -16,78 +16,73 @@ class Table extends Component {
     super();
 
     this.state = {
-      rowsData: [],
-      initialRecentDataShown: true,
-      allTimeDataShown: false,
-      allTimeDataDesc: true,
+      defaultData: [],
+      recentData: [],
+      allTimeData: [],
+      recentDataDesc: true,
+      allTimeDataDesc: false,
     };
   }
 
-  componentDidMount() {
-    this.fetchData(top30Url)
+  urlGenerator(slug) {
+    return url + slug;
   }
 
-  fetchData(url) {
+  componentDidMount() {
+    this.fetchData(this.urlGenerator('recent'), 'recent');
+    this.fetchData(this.urlGenerator('alltime'), 'allTime');
+  }
+
+  fetchData(url, type) {
     fetch(url)
     .then((res) => res.json())
     .then((data) => {
-      this.setState({
-        rowsData: data,
-      });
+      if (type === 'recent') {
+        this.setState({
+          defaultData: data,
+          recentData: data,
+        });
+      } else if (type === 'allTime') {
+        this.setState({
+          allTimeData: data,
+        });
+      }
     })
     .catch((err) => console.err('err::', err))
   }
 
   handleSort = (sortType) => {    
-    if (sortType === 'past30Days' && this.state.allTimeDataShown) {
-      this.fetchData(top30Url);
-      this.setState({
-        initialRecentDataShown: true,
-        allTimeDataShown: false,
-      });
-    }
-
-    else if (sortType === 'past30Days') {
+    if (sortType === 'past30Days') {
       this.sortRowsRecentData();
     }
 
-    else if (sortType === 'allTime' && this.state.allTimeDataShown) {
-      this.sortAllTimeData();
-    }
-
     else if (sortType === 'allTime') {
-      this.fetchData(allTimeUrl);
-      this.setState({
-        initialRecentDataShown: false,
-        allTimeDataShown: true,
-      });
+      this.sortAllTimeData();
     }
   }
 
   sortRowsRecentData() {
-    const { rowsData, initialRecentDataShown } = this.state;
+    const { recentData, recentDataDesc } = this.state;
 
-    const sortedRecentData = initialRecentDataShown ? rowsData.sort((a, b) => a.recent - b.recent) : rowsData.sort((a, b) => b.recent - a.recent);
-
+    const sortedRecentData = recentDataDesc ? recentData.sort((a, b) => a.recent - b.recent) : recentData.sort((a, b) => b.recent - a.recent);
     this.setState({
-      rowsData: sortedRecentData,
-      initialRecentDataShown: !this.state.initialRecentDataShown,
+      defaultData: sortedRecentData,
+      recentDataDesc: !this.state.recentDataDesc,
     });
   }
 
   sortAllTimeData() {
-    const { rowsData, allTimeDataDesc } = this.state;
+    const { allTimeData, allTimeDataDesc } = this.state;
 
-    const sortedAllTimeData = allTimeDataDesc ? rowsData.sort((a, b) => a.alltime - b.alltime) : rowsData.sort((a, b) => b.alltime - a.alltime);
-
+    const sortedAllTimeData = allTimeDataDesc ? allTimeData.sort((a, b) => a.alltime - b.alltime) : allTimeData.sort((a, b) => b.alltime - a.alltime);
     this.setState({
-      rowsData: sortedAllTimeData,
+      defaultData: sortedAllTimeData,
       allTimeDataDesc: !this.state.allTimeDataDesc,
     });
   }
 
   render() {
-    const rows = this.state.rowsData.map((rowData, i) => {
+    const rows = this.state.defaultData.map((rowData, i) => {
       return <TableRow key={i} id={i+1} rowData={rowData} />
     });
 
