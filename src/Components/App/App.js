@@ -8,9 +8,9 @@ class App extends Component {
   render() {
     return (
       <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-        </header>
+            <header className="App-header">
+              <img src={logo} className="App-logo" alt="logo" />
+            </header>
         <div className="container">
           <div className="row">
             <div className="col-lg-12">
@@ -21,7 +21,9 @@ class App extends Component {
           </div>
           <div className="row">
             <div className="col-lg-12">
-              <Table />
+              <div className="overflow-table">
+                <Table />
+              </div>
             </div>
           </div>
         </div>
