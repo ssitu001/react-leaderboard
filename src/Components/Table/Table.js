@@ -17,6 +17,9 @@ class Table extends Component {
 
     this.state = {
       rowsData: [],
+      initialRecentDataShown: true,
+      allTimeDataShown: false,
+      allTimeDataDesc: true,
     };
   }
 
@@ -36,13 +39,51 @@ class Table extends Component {
   }
 
   handleSort = (sortType) => {    
-    if (sortType === 'past30Days') {
+    if (sortType === 'past30Days' && this.state.allTimeDataShown) {
       this.fetchData(top30Url);
+      this.setState({
+        initialRecentDataShown: true,
+        allTimeDataShown: false,
+      });
     }
 
-    if (sortType === 'allTime') {
-      this.fetchData(allTimeUrl)
+    else if (sortType === 'past30Days') {
+      this.sortRowsRecentData();
     }
+
+    else if (sortType === 'allTime' && this.state.allTimeDataShown) {
+      this.sortAllTimeData();
+    }
+
+    else if (sortType === 'allTime') {
+      this.fetchData(allTimeUrl);
+      this.setState({
+        initialRecentDataShown: false,
+        allTimeDataShown: true,
+      });
+    }
+  }
+
+  sortRowsRecentData() {
+    const { rowsData, initialRecentDataShown } = this.state;
+
+    const sortedRecentData = initialRecentDataShown ? rowsData.sort((a, b) => a.recent - b.recent) : rowsData.sort((a, b) => b.recent - a.recent);
+
+    this.setState({
+      rowsData: sortedRecentData,
+      initialRecentDataShown: !this.state.initialRecentDataShown,
+    });
+  }
+
+  sortAllTimeData() {
+    const { rowsData, allTimeDataDesc } = this.state;
+
+    const sortedAllTimeData = allTimeDataDesc ? rowsData.sort((a, b) => a.alltime - b.alltime) : rowsData.sort((a, b) => b.alltime - a.alltime);
+
+    this.setState({
+      rowsData: sortedAllTimeData,
+      allTimeDataDesc: !this.state.allTimeDataDesc,
+    });
   }
 
   render() {
@@ -55,18 +96,16 @@ class Table extends Component {
     });
 
     return (
-      <div>
-        <table>
-          <tbody>
-            <tr>
-              <th scope="col">#</th>
-              <th scope="col">Camper Name</th>
-              {sorters}
-            </tr>
-            {rows}
-            </tbody>
-        </table>
-      </div>
+      <table>
+        <tbody>
+          <tr>
+            <th scope="col">#Rank</th>
+            <th scope="col">Username</th>
+            {sorters}
+          </tr>
+          {rows}
+          </tbody>
+      </table>
     )
   }
 }
