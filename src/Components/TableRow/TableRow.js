@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import './TableRow.css';
 
@@ -20,5 +21,10 @@ const TableRow = (props) => {
     </tr>
   )
 }
+
+TableRow.propTypes = {
+  id: PropTypes.number,
+  rowData: PropTypes.object,
+};
 
 export default TableRow;
